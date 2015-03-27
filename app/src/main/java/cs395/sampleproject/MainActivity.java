@@ -27,10 +27,18 @@ import bolts.Task;
 
 public class MainActivity extends ActionBarActivity {
 
+    // These don't *need* to be variables here, but it's easier to avoid errors this way.
+    // Plus, it's helpful as documentation for what fields your ParseObjects have.
+    protected String TASK = "task";
+    protected String TASK_NAME = "name";
+    protected String TASK_COMPLETED = "completed";
+
     protected void startParse() {
+        // TODO: Set these here or else Parse won't be able to properly initialize!
         String applicationId = "";
         String clientKey = "";
 
+        // Make sure the Application ID and Client Key are set.
         if (applicationId.equals("") || clientKey.equals("")){
             Log.e("startParseError", "Properly set your ApplicationId and ClientKey!");
         }
@@ -41,11 +49,11 @@ public class MainActivity extends ActionBarActivity {
 
     protected ParseObject makeTask(String name) {
         // Initialize the object and the table if necessary.
-        ParseObject task = new ParseObject("Task");
+        ParseObject task = new ParseObject(TASK);
 
         // Add key-value pairs to this task.
-        task.put("name", name);
-        task.put("completed", false);
+        task.put(TASK_NAME, name);
+        task.put(TASK_COMPLETED, false);
 
         // Save the object to Parse’s Cloud.
         task.saveInBackground();
@@ -56,8 +64,8 @@ public class MainActivity extends ActionBarActivity {
 
     protected void displayTasks() {
         // Prepare a query to find all of the non-completed Tasks.
-        ParseQuery query = new ParseQuery("Task");
-        query.whereEqualTo("completed", false);
+        ParseQuery query = new ParseQuery(TASK);
+        query.whereEqualTo(TASK_COMPLETED, false);
 
         // Prepare a FindCallback to display the Tasks that are found.
         FindCallback displayTasksCallback = getDisplayTasksCallback();
@@ -68,14 +76,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     protected void completeTask(ParseObject task) {
-        task.put("completed", true);
+        task.put(TASK_COMPLETED, true);
         task.saveInBackground();
     }
 
     protected void displayTask(final ParseObject task) {
         final TableLayout table = (TableLayout) findViewById(R.id.taskList);
         final Context context = this;
-        String name = task.getString("name");
+        String name = task.getString(TASK_NAME);
 
         // Create a TextView to add to the TableLayout.
         // Note: There are more efficient ways to do this (eg: use a ListView).
@@ -86,7 +94,10 @@ public class MainActivity extends ActionBarActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Set the "completed" field of this task to `true` and save it.
                 completeTask(task);
+
+                // Then, hide the task's TextView so it "disappears" from the screen.
                 textView.setVisibility(View.GONE);
             }
         });
